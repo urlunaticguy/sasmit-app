@@ -1,8 +1,11 @@
+require('dotenv').config();
+
+// Check if the API key is loaded correctly
 const { MongoClient, ServerApiVersion } = require('mongodb');
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: process.env.OPENAI_API_KEY,
   organization: 'org-xsDgtmsKXXeuuBAmtTaXLpBd',
 });
 
