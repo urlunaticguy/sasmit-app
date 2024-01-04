@@ -2,7 +2,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: "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",
   organization: 'org-xsDgtmsKXXeuuBAmtTaXLpBd',
 });
 
