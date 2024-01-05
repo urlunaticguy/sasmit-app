@@ -100,7 +100,7 @@ export default async function handler(req, res) {
     });
   });
   console.log(req.body)
-  let { val, name, password, email, question } = req.body;
+  let { val, name, password, email, question, conversation } = req.body;
 
   try {
     // const result = await run();
@@ -112,7 +112,7 @@ export default async function handler(req, res) {
       res.status(200).json(res);
     } else if (val === "ho") {
       const completion = await openai.chat.completions.create({
-        messages: [{ role: "user", content: question }],
+        messages: [{ role: "user", content: `this is the previous conversation if any ${conversation} and this is the current question ${question}` }],
         model: "gpt-4",
       });
     
