@@ -3,6 +3,11 @@ require('dotenv').config();
 // Check if the API key is loaded correctly
 const { MongoClient, ServerApiVersion } = require('mongodb');
 import OpenAI from "openai";
+import Cors from 'cors';
+
+const cors = Cors({
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+});
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -85,6 +90,9 @@ export async function loginUser (email, password) {
 }
 
 export default async function handler(req, res) {
+
+  await cors(req, res);
+
   console.log(req.body)
   let { val, name, password, email, question } = req.body;
 
