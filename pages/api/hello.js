@@ -91,8 +91,14 @@ export async function loginUser (email, password) {
 
 export default async function handler(req, res) {
 
-  await cors(req, res);
-
+  await new Promise((resolve, reject) => {
+    cors(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
   console.log(req.body)
   let { val, name, password, email, question } = req.body;
 
