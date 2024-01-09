@@ -2,7 +2,6 @@ require('dotenv').config();
 
 // Check if the API key is loaded correctly
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const translate = require('google-translate-api');
 import OpenAI from "openai";
 import Cors from 'cors';
 
