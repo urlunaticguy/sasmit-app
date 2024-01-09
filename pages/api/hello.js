@@ -8,6 +8,7 @@ import Cors from 'cors';
 
 const cors = Cors({
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+  origin: 'http://localhost:3000'
 });
 
 const openai = new OpenAI({
