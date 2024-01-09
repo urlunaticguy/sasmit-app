@@ -2,7 +2,7 @@ export default function PrivacyPolicy() {
   return (
     <div>
       <h1>Privacy Policy</h1>
-      <p>Welcome to EduJourney's Privacy Policy page.</p>
+      <p>Welcome to EduJourneys Privacy Policy page.</p>
 
       <h2>Information Collection and Use</h2>
       <p>
@@ -15,7 +15,7 @@ export default function PrivacyPolicy() {
       <h2>Use of Information</h2>
       <p>
         The information collected may be used for various purposes including:
-        - Providing and maintaining the app's services.
+        - Providing and maintaining the apps services.
         - Improving user experience.
         - Sending periodic emails or notifications related to services or updates.
         - Customizing content and advertising.
