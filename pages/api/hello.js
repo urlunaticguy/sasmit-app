@@ -2,6 +2,7 @@ require('dotenv').config();
 
 // Check if the API key is loaded correctly
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const translate = require('google-translate-api');
 import OpenAI from "openai";
 import Cors from 'cors';
 
@@ -113,13 +114,26 @@ export default async function handler(req, res) {
     } else if (val === "ho") {
       const completion = await openai.chat.completions.create({
         messages: [{ role: "user", content: `this is the previous conversation if any ${conversation} and this is the current question ${question}` }],
-        model: "gpt-4",
+        model: "gpt-4"
       });
     
       console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
+    } else if (val === "lo") {
+      let value = '';
+      translate('Ik spreek Engels', {to: 'en'}).then(res => {
+          console.log(res.text);
+          //=> I speak English
+          console.log(res.from.language.iso);
+          value = res.text;
+          //=> nl
+      }).catch(err => {
+          console.error(err);
+      });
+      res.status(200).json(value);
     } else {
-    res.status(200).json(result);}
+      res.status(200).json(result);
+    }
   } catch (error) {
     res.status(500).json({ message: 'Error connecting to database', error });
   } finally {
