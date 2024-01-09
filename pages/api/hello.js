@@ -7,9 +7,7 @@ import OpenAI from "openai";
 import Cors from 'cors';
 
 const cors = Cors({
-  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
-  origin: 'http://localhost:3000'
-});
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE']});
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
