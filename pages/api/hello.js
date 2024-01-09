@@ -118,18 +118,6 @@ export default async function handler(req, res) {
     
       console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
-    } else if (val === "lo") {
-      let value = '';
-      translate('Ik spreek Engels', {to: 'en'}).then(res => {
-          console.log(res.text);
-          //=> I speak English
-          console.log(res.from.language.iso);
-          value = res.text;
-          //=> nl
-      }).catch(err => {
-          console.error(err);
-      });
-      res.status(200).json(value);
     } else {
       res.status(200).json(result);
     }
