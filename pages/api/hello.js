@@ -123,7 +123,7 @@ export default async function handler(req, res) {
         questionLocal = 'Generate a set of five questions on Simple Harmonics Motion along with their correct answers.'
       }
         const completion = await openai.chat.completions.create({
-          messages: [{ role: "user", content: `Ask one question on simple harmonic motion. Keep the question short and the answer should be one word or two words maximum. You can also ask numerical questions whose answer is a number. Provide the answer after the question in a format like Question : <your question> ? Answer : <your answer>. This is a list of questions generated previously, skip them ${questions}` }],
+          messages: [{ role: "user", content: `Ask a question on simple harmonic motion. Keep it concise, with an answer of one or two words, or a numerical answer. Use the format: Question: <Your question> ? Answer: <Your answer>. Avoid repeating previously generated questions.` }],
           model: "gpt-3.5-turbo"
         });
       
