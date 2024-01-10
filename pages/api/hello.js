@@ -99,7 +99,7 @@ export default async function handler(req, res) {
     });
   });
   console.log(req.body)
-  let { val, name, password, email, question, conversation, language, level } = req.body;
+  let { val, name, password, email, question, conversation, language, level, questions } = req.body;
 
   try {
     // const result = await run();
@@ -123,7 +123,7 @@ export default async function handler(req, res) {
         questionLocal = 'Generate a set of five questions on Simple Harmonics Motion along with their correct answers.'
       }
         const completion = await openai.chat.completions.create({
-          messages: [{ role: "user", content: `Ask one question on simple harmonic motion. Keep the question short and the answer should be one word or two words maximum. Provide the answer after the question in a format like Question : <your question> ? Answer : <your answer>.` }],
+          messages: [{ role: "user", content: `Ask one question on simple harmonic motion. Keep the question short and the answer should be one word or two words maximum. You can also ask numerical questions whose answer is a number. Provide the answer after the question in a format like Question : <your question> ? Answer : <your answer>. This is a list of questions generated previously, skip them ${questions}` }],
           model: "gpt-3.5-turbo"
         });
       
