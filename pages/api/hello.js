@@ -99,7 +99,7 @@ export default async function handler(req, res) {
     });
   });
   console.log(req.body)
-  let { val, name, password, email, question, conversation, language } = req.body;
+  let { val, name, password, email, question, conversation, language, level } = req.body;
 
   try {
     // const result = await run();
@@ -117,6 +117,14 @@ export default async function handler(req, res) {
     
       console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
+    } else if (val === "mo") {
+      // const completion = await openai.chat.completions.create({
+      //   messages: [{ role: "user", content: `this is the previous conversation if any ${conversation} and this is the current question ${question}. generate the reply in ${language}` }],
+      //   model: "gpt-3.5-turbo"
+      // });
+    
+      // console.log(completion.choices[0]);
+      res.status(200).json({ gameStarted: true, level });
     } else {
       res.status(200).json(result);
     }
