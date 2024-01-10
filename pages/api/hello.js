@@ -118,13 +118,17 @@ export default async function handler(req, res) {
       console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
     } else if (val === "mo") {
-      // const completion = await openai.chat.completions.create({
-      //   messages: [{ role: "user", content: `this is the previous conversation if any ${conversation} and this is the current question ${question}. generate the reply in ${language}` }],
-      //   model: "gpt-3.5-turbo"
-      // });
+      let questionLocal = '';
+      if (level === 0) {
+        questionLocal = 'Generate a set of five questions on Simple Harmonics Motion along with their correct answers.'
+      }
+      const completion = await openai.chat.completions.create({
+        messages: [{ role: "user", content: `${questionLocal}` }],
+        model: "gpt-3.5-turbo"
+      });
     
-      // console.log(completion.choices[0]);
-      res.status(200).json({ gameStarted: true, level });
+      console.log(completion.choices[0]);
+      res.status(200).json(completion.choices[0]);
     } else {
       res.status(200).json(result);
     }
