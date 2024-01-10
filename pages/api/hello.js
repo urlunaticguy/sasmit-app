@@ -122,20 +122,13 @@ export default async function handler(req, res) {
       if (level === 0) {
         questionLocal = 'Generate a set of five questions on Simple Harmonics Motion along with their correct answers.'
       }
-      let conversationLocal = '';
-      for (let i = 0; i < 5; i++) {
         const completion = await openai.chat.completions.create({
-          messages: [{ role: "user", content: `Ask one question on simple harmonic motion. Keep the question and answer short. Provide the answer after the question. These are the previous questions ${conversationLocal}, so avoid them.` }],
+          messages: [{ role: "user", content: `Ask one question on simple harmonic motion. Keep the question and answer short. Provide the answer after the question.` }],
           model: "gpt-3.5-turbo"
         });
-
-        conversationLocal += completion.choices[0];
-        console.log("Running for loop")
-      }
       
-    
       // console.log(completion.choices[0]);
-      res.status(200).json(conversationLocal);
+      res.status(200).json(completion.choices[0]);
     } else {
       res.status(200).json(result);
     }
