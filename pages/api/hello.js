@@ -108,9 +108,9 @@ export default async function handler(req, res) {
       const ress = await loginUser(email, password);
       console.log(ress);
       if (ress === null) {
-        res.status(403).json({ user : null, message : "Not Found or Unauthorised"})
+        res.status(403).json({ user : null, message : "Not Found or Unauthorised", loggedIn: false})
       }
-      res.status(200).json({ user : ress, message : "Success in Login"});
+      res.status(200).json({ user : ress, message : "Success in Login", loggedIn: true});
     } else if (val === "ho") {
       const completion = await openai.chat.completions.create({
         messages: [{ role: "user", content: `this is the previous conversation if any ${conversation} and this is the current question ${question}. generate the reply in ${language}` }],
