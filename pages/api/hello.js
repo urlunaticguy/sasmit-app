@@ -23,23 +23,14 @@ const client = new MongoClient(uri, {
   }
 });
 
-async function run() {
-  try {
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    return { message: 'Successfully connected to MongoDB' };
-  } finally {
-    await client.close();
-  }
-}
-
 export async function connectToDatabase() {
   try {
     await client.connect();
     console.log('Connected to MongoDB');
     return client.db('your_database_name');
   } catch (error) {
-    throw new Error('Error connecting to database: ' + error);
+    console.error('Error connecting to database:', error);
+    throw new Error('Error connecting to database: ' + error.message);
   }
 }
 
@@ -54,13 +45,13 @@ export async function addUser(email, password, name) {
   try {
     const newUser = {
       email: email,
-      password: password, // Note: In production, ensure to hash the password for security
+      password: password,
       name: name
     };
 
     const result = await collection.insertOne(newUser);
     console.log('User added successfully:', result.insertedId);
-    return result.insertedId; // Return the ID of the inserted user
+    return result;
   } catch (error) {
     throw new Error('Error adding user: ' + error);
   } finally {
@@ -73,23 +64,24 @@ export async function loginUser (email, password) {
   const collection = db.collection('users');
 
   try {
-    const user = await collection.find({});
-    if (!user) {
-      return null; // Return null if user not found or credentials are invalid
+    const user = await collection.findOne({ email, password });
+    if (user) {
+      console.log('User found:', user);
+      return user;
+    } else {
+      console.log('User not found');
+      return null;
     }
-
-    // const { name, email: userEmail, password: userPassword } = user;
-    // return { name, email: userEmail, password: userPassword };
-    return user;
   } catch (error) {
     throw new Error('Error logging in: ' + error);
   } finally {
-    // closeDatabase();
+    closeDatabase();
   }
 }
 
 export default async function handler(req, res) {
 
+  //cors function
   await new Promise((resolve, reject) => {
     cors(req, res, (result) => {
       if (result instanceof Error) {
@@ -98,17 +90,27 @@ export default async function handler(req, res) {
       return resolve(result);
     });
   });
+
   console.log(req.body)
+
   let { val, name, password, email, question, conversation, language, level, questions } = req.body;
 
   try {
-    // const result = await run();
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    // return { message: 'Successfully connected to MongoDB' };
-    if (val === "hey") {
-      const res = addUser(email, password, name);
-      res.status(200).json(res);
+    if (val === "signup") {
+      const ress = await addUser(email, password, name);
+      if (ress !== null) {
+        if (ress.acknowledged === true) {
+          res.status(200).json({userCreated: true});
+        }
+      }
+      res.status(200).json({userCreated: false});
+    } else if (val === "login") {
+      const ress = await loginUser(email, password);
+      console.log(ress);
+      if (ress === null) {
+        res.status(403).json({ user : null, message : "Not Found or Unauthorised"})
+      }
+      res.status(200).json({ user : ress, message : "Success in Login"});
     } else if (val === "ho") {
       const completion = await openai.chat.completions.create({
         messages: [{ role: "user", content: `this is the previous conversation if any ${conversation} and this is the current question ${question}. generate the reply in ${language}` }],
@@ -134,8 +136,6 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     res.status(500).json({ message: 'Error connecting to database', error });
-  } finally {
-    await client.close();
   }
 }
 
