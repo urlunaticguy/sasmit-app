@@ -53,7 +53,8 @@ export async function addUser(email, password, name) {
     const newUser = {
       email: email,
       password: password,
-      name: name
+      name: name,
+      points: 0
     };
 
     const result = await collection.insertOne(newUser);
@@ -86,6 +87,33 @@ export async function loginUser (email, password) {
   }
 }
 
+export async function updateUserPointsByEmail(email, newPoints) {
+  const db = await connectToDatabase();
+  const collection = db.collection('users');
+
+  try {
+    const existingUser = await collection.findOne({ email: email });
+
+    if (!existingUser) {
+      throw new Error('User not found with the given email.');
+    }
+
+    // Update user's points
+    await collection.updateOne(
+      { email: email },
+      { $set: { points: newPoints } }
+    );
+
+    console.log('User points updated successfully:', existingUser._id);
+
+    return existingUser;
+  } catch (error) {
+    throw new Error('Error updating user points: ' + error);
+  } finally {
+    closeDatabase();
+  }
+}
+
 export default async function handler(req, res) {
 
   //cors function
@@ -100,7 +128,7 @@ export default async function handler(req, res) {
 
   console.log(req.body)
 
-  let { val, name, password, email, question, conversation, language, level, questions } = req.body;
+  let { val, name, password, email, question, conversation, language, level, questions, id, pointsUpdate } = req.body;
 
   try {
     if (val === "signup") {
@@ -139,6 +167,10 @@ export default async function handler(req, res) {
       
       // console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
+    } else if (val === "updatePoints") {
+      const lol = await updateUserPointsByEmail(email, pointsUpdate);
+      console.log("IF ELSE GONE RIGHT");
+      res.status(200).json(lol)
     } else {
       res.status(200).json(result);
     }
