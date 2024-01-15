@@ -27,6 +27,7 @@ export async function connectToDatabase() {
   try {
     await client.connect();
     console.log('Connected to MongoDB');
+    await client.db.collection('users').createIndex({ points: -1 });
     return client.db('your_database_name');
   } catch (error) {
     console.error('Error connecting to database:', error);
@@ -43,6 +44,12 @@ export async function addUser(email, password, name) {
   const collection = db.collection('users');
 
   try {
+    const existingUser = await collection.findOne({ email: email });
+
+    if (existingUser) {
+      throw new Error('Email already exists. Please choose a different email.');
+    }
+
     const newUser = {
       email: email,
       password: password,
