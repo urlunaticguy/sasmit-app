@@ -27,7 +27,7 @@ export async function connectToDatabase() {
   try {
     await client.connect();
     console.log('Connected to MongoDB');
-    // await client.db.collection('users').createIndex({ points: -1 });
+    await client.db('your_database_name').collection('users').createIndex({ points: -1 });
     return client.db('your_database_name');
   } catch (error) {
     console.error('Error connecting to database:', error);
