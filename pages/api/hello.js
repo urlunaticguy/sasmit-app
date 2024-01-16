@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-// Check if the API key is loaded correctly
 const { MongoClient, ServerApiVersion } = require('mongodb');
 import OpenAI from "openai";
 import Cors from 'cors';
@@ -151,8 +150,6 @@ export default async function handler(req, res) {
     });
   });
 
-  console.log(req.body)
-
   let { val, name, password, email, question, conversation, language, level, questions, id, pointsUpdate, levelUpdate } = req.body;
 
   try {
@@ -167,12 +164,11 @@ export default async function handler(req, res) {
       }
     } else if (val === "login") {
       const ress = await loginUser(email, password);
-      console.log(ress);
       if (ress === null) {
         res.status(403).json({ user : null, message : "Not Found or Unauthorised", loggedIn: false})
       }
       res.status(200).json({ user : ress, message : "Success in Login", loggedIn: true});
-    } else if (val === "ho") {
+    } else if (val === "askChatGPT") {
       const completion = await openai.chat.completions.create({
         messages: [{ role: "user", content: `this is the previous conversation if any ${conversation} and this is the current question ${question}. generate the reply in ${language}` }],
         model: "gpt-3.5-turbo"
@@ -180,7 +176,7 @@ export default async function handler(req, res) {
     
       console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
-    } else if (val === "mo") {
+    } else if (val === "sampleTest") {
       let questionLocal = '';
       if (level === 0) {
         questionLocal = 'Generate a set of five questions on Simple Harmonics Motion along with their correct answers.'
@@ -189,8 +185,6 @@ export default async function handler(req, res) {
           messages: [{ role: "user", content: `Ask one question on simple harmonic motion. Keep the question short and the answer should be one word or two words maximum. Provide the answer after the question in a format like Question : <your question> ? Answer : <your answer>. Try unique questions` }],
           model: "gpt-3.5-turbo"
         });
-      
-      // console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
     } else if (val === "updatePoints") {
       const response = await updateUserPointsByEmail(email, pointsUpdate);
