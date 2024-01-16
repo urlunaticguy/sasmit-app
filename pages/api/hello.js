@@ -138,6 +138,29 @@ export async function updateUserLevelByEmail(email, levelToChange) {
   }
 }
 
+export async function getTopUsers() {
+  const db = await connectToDatabase();
+  const collection = db.collection('users');
+
+  try {
+    const topUsers = await collection.find().sort({ points: -1 }).limit(10).toArray();
+
+    const formattedTopUsers = topUsers.map(user => ({
+      name: user.name, // Replace with the actual field name for user's name
+      points: user.points,
+      level: user.level
+    }));
+
+    console.log('Top 10 users:', formattedTopUsers);
+    return formattedTopUsers;
+  } catch (error) {
+    throw new Error('Error fetching top users: ' + error);
+  } finally {
+    closeDatabase();
+  }
+}
+
+
 export default async function handler(req, res) {
 
   //cors function
@@ -191,6 +214,9 @@ export default async function handler(req, res) {
       res.status(200).json(response);
     } else if (val === "updateLevel") {
       const response = await updateUserLevelByEmail(email, levelUpdate);
+      res.status(200).json(response);
+    } else if (val === "getLeaderboard") {
+      const response = await getTopUsers();
       res.status(200).json(response);
     } else {
       res.status(200).json(result);
