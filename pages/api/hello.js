@@ -166,6 +166,12 @@ export async function addWeaknessQuestionByEmail(email, newQuestion) {
   const collection = db.collection('users');
 
   try {
+    if (newQuestion === "") {
+      const user = await collection.findOne({
+        email: email
+      })
+      return user;
+    }
     const updatedUser = await collection.findOneAndUpdate(
       { email: email },
       { $push: { weaknessQuestions: {side: 0, text: newQuestion} } },
