@@ -150,7 +150,7 @@ export default async function handler(req, res) {
     });
   });
 
-  let { val, name, password, email, question, conversation, language, level, questions, id, pointsUpdate, levelUpdate } = req.body;
+  let { val, name, password, email, question, conversation, language, level, pointsUpdate, levelUpdate } = req.body;
 
   try {
     if (val === "signup") {
@@ -176,7 +176,7 @@ export default async function handler(req, res) {
     
       console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
-    } else if (val === "sampleTest") {
+    } else if (val === "missionExam") {
       let questionLocal = '';
       if (level === 0) {
         questionLocal = 'Generate a set of five questions on Simple Harmonics Motion along with their correct answers.'
