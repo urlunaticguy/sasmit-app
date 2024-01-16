@@ -161,6 +161,29 @@ export async function getTopUsers() {
   }
 }
 
+export async function addWeaknessQuestionByEmail(email, newQuestion) {
+  const db = await connectToDatabase();
+  const collection = db.collection('users');
+
+  try {
+    const updatedUser = await collection.findOneAndUpdate(
+      { email: email },
+      { $push: { weaknessQuestions: newQuestion } },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser) {
+      throw new Error('User not found with the given email.');
+    }
+
+    console.log('User updated with new weakness question:', updatedUser);
+    return updatedUser;
+  } catch (error) {
+    throw new Error('Error updating user with new weakness question: ' + error);
+  } finally {
+    closeDatabase();
+  }
+}
 
 export default async function handler(req, res) {
 
@@ -174,7 +197,7 @@ export default async function handler(req, res) {
     });
   });
 
-  let { val, name, password, email, question, conversation, language, level, pointsUpdate, levelUpdate } = req.body;
+  let { val, name, password, email, question, conversation, language, level, pointsUpdate, levelUpdate, weaknessQuestion } = req.body;
 
   try {
     if (val === "signup") {
@@ -218,6 +241,9 @@ export default async function handler(req, res) {
       res.status(200).json(response);
     } else if (val === "getLeaderboard") {
       const response = await getTopUsers();
+      res.status(200).json(response);
+    } else if (val === "updateWeaknessQuestion") {
+      const response = await addWeaknessQuestionByEmail(email, weaknessQuestion);
       res.status(200).json(response);
     } else {
       res.status(200).json(result);
