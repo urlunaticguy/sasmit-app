@@ -55,6 +55,7 @@ export async function addUser(email, password, name) {
       password: password,
       name: name,
       points: 0,
+      pointsToGo: 300,
       level: 1
     };
 
@@ -93,9 +94,11 @@ export async function updateUserPointsByEmail(email, pointsToAdd) {
   const collection = db.collection('users');
 
   try {
+    const levelToUpdateTo = Math.floor(pointsToAdd / 300);
+    const remainingPointsForNextLevel = pointsToAdd - (levelToUpdateTo * 300);
     const updatedUser = await collection.findOneAndUpdate(
       { email: email },
-      { $inc: { points: pointsToAdd } },
+      { $set: { points: pointsToAdd, pointsToGo: remainingPointsForNextLevel, level: levelToUpdateTo } },
       { returnDocument: 'after' }
     );
 
