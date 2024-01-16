@@ -55,7 +55,8 @@ export async function addUser(email, password, name) {
       name: name,
       points: 0,
       pointsToGo: 300,
-      level: 1
+      level: 1,
+      weaknessQuestions: [],
     };
 
     const result = await collection.insertOne(newUser);
