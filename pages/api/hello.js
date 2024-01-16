@@ -168,7 +168,7 @@ export async function addWeaknessQuestionByEmail(email, newQuestion) {
   try {
     const updatedUser = await collection.findOneAndUpdate(
       { email: email },
-      { $push: { weaknessQuestions: newQuestion } },
+      { $push: { weaknessQuestions: {side: 0, text: newQuestion} } },
       { returnDocument: 'after' }
     );
 
