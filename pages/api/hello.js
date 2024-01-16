@@ -54,7 +54,8 @@ export async function addUser(email, password, name) {
       email: email,
       password: password,
       name: name,
-      points: 0
+      points: 0,
+      level: 1
     };
 
     const result = await collection.insertOne(newUser);
@@ -87,28 +88,49 @@ export async function loginUser (email, password) {
   }
 }
 
-export async function updateUserPointsByEmail(email, newPoints) {
+export async function updateUserPointsByEmail(email, pointsToAdd) {
   const db = await connectToDatabase();
   const collection = db.collection('users');
 
   try {
-    const existingUser = await collection.findOne({ email: email });
+    const updatedUser = await collection.findOneAndUpdate(
+      { email: email },
+      { $inc: { points: pointsToAdd } },
+      { returnDocument: 'after' }
+    );
 
-    if (!existingUser) {
+    if (!updatedUser) {
       throw new Error('User not found with the given email.');
     }
 
-    // Update user's points
-    await collection.updateOne(
-      { email: email },
-      { $set: { points: newPoints } }
-    );
-
-    console.log('User points updated successfully:', existingUser._id);
-
-    return existingUser;
+    console.log('User points updated successfully:', updatedUser);
+    return updatedUser;
   } catch (error) {
     throw new Error('Error updating user points: ' + error);
+  } finally {
+    closeDatabase();
+  }
+}
+
+export async function updateUserLevelByEmail(email, levelToChange) {
+  const db = await connectToDatabase();
+  const collection = db.collection('users');
+
+  try {
+    const updatedUser = await collection.findOneAndUpdate(
+      { email: email },
+      { $set: { level: levelToChange } },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser) {
+      throw new Error('User not found with the given email.');
+    }
+
+    console.log('User Level updated successfully:', updatedUser);
+    return updatedUser;
+  } catch (error) {
+    throw new Error('Error updating user Level: ' + error);
   } finally {
     closeDatabase();
   }
@@ -128,7 +150,7 @@ export default async function handler(req, res) {
 
   console.log(req.body)
 
-  let { val, name, password, email, question, conversation, language, level, questions, id, pointsUpdate } = req.body;
+  let { val, name, password, email, question, conversation, language, level, questions, id, pointsUpdate, levelUpdate } = req.body;
 
   try {
     if (val === "signup") {
@@ -168,9 +190,11 @@ export default async function handler(req, res) {
       // console.log(completion.choices[0]);
       res.status(200).json(completion.choices[0]);
     } else if (val === "updatePoints") {
-      const lol = await updateUserPointsByEmail(email, pointsUpdate);
-      console.log("IF ELSE GONE RIGHT");
-      res.status(200).json(lol)
+      const response = await updateUserPointsByEmail(email, pointsUpdate);
+      res.status(200).json(response);
+    } else if (val === "updateLevel") {
+      const response = await updateUserLevelByEmail(email, levelUpdate);
+      res.status(200).json(response);
     } else {
       res.status(200).json(result);
     }
