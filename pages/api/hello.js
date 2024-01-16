@@ -57,6 +57,7 @@ export async function addUser(email, password, name) {
       pointsToGo: 300,
       level: 1,
       weaknessQuestions: [],
+      chatHistories: {},
     };
 
     const result = await collection.insertOne(newUser);
@@ -191,6 +192,47 @@ export async function addWeaknessQuestionByEmail(email, newQuestion) {
   }
 }
 
+export async function addChatMessageByEmail(email, chatTitle, newMessages) {
+  const db = await connectToDatabase();
+  const collection = db.collection('users');
+
+  try {
+    const existingUser = await collection.findOne({ email: email });
+
+    if (!existingUser) {
+      throw new Error('User not found with the given email.');
+    }
+
+    const existingChat = existingUser.chatHistories.find(chat => chat.title === chatTitle);
+
+    if (existingChat) {
+      // If chat history with the same title exists, append new messages
+      const updatedUser = await collection.findOneAndUpdate(
+        { email: email, 'chatHistories.title': chatTitle },
+        { $push: { 'chatHistories.$.messages': { $each: newMessages } } },
+        { returnDocument: 'after' }
+      );
+
+      console.log('New messages added to existing chat:', updatedUser);
+      return updatedUser;
+    } else {
+      // If chat history with the title doesn't exist, create a new one
+      const updatedUser = await collection.findOneAndUpdate(
+        { email: email },
+        { $push: { chatHistories: { title: chatTitle, messages: newMessages } } },
+        { returnDocument: 'after' }
+      );
+
+      console.log('New chat history created with messages:', updatedUser);
+      return updatedUser;
+    }
+  } catch (error) {
+    throw new Error('Error adding chat message: ' + error);
+  } finally {
+    closeDatabase();
+  }
+}
+
 export default async function handler(req, res) {
 
   //cors function
@@ -203,7 +245,7 @@ export default async function handler(req, res) {
     });
   });
 
-  let { val, name, password, email, question, conversation, language, level, pointsUpdate, levelUpdate, weaknessQuestion } = req.body;
+  let { val, name, password, email, question, conversation, language, level, pointsUpdate, levelUpdate, weaknessQuestion, chatTitle, newMessage } = req.body;
 
   try {
     if (val === "signup") {
@@ -250,6 +292,9 @@ export default async function handler(req, res) {
       res.status(200).json(response);
     } else if (val === "updateWeaknessQuestion") {
       const response = await addWeaknessQuestionByEmail(email, weaknessQuestion);
+      res.status(200).json(response);
+    } else if (val === "updateChatHistory") {
+      const response = await addChatMessageByEmail(email, chatTitle, newMessage);
       res.status(200).json(response);
     } else {
       res.status(200).json(result);
