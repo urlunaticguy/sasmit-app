@@ -192,7 +192,7 @@ export async function addWeaknessQuestionByEmail(email, newQuestion) {
   }
 }
 
-export async function addChatMessageByEmail(email, chatTitle, newMessages) {
+export async function addChatMessageByEmail(email, chatTitle, newMessage) {
   const db = await connectToDatabase();
   const collection = db.collection('users');
 
@@ -206,24 +206,24 @@ export async function addChatMessageByEmail(email, chatTitle, newMessages) {
     const existingChat = existingUser.chatHistories.find(chat => chat.title === chatTitle);
 
     if (existingChat) {
-      // If chat history with the same title exists, append new messages
+      // If chat history with the same title exists, append new message
       const updatedUser = await collection.findOneAndUpdate(
         { email: email, 'chatHistories.title': chatTitle },
-        { $push: { 'chatHistories.$.messages': { $each: newMessages } } },
+        { $push: { 'chatHistories.$.messages': newMessage } },
         { returnDocument: 'after' }
       );
 
-      console.log('New messages added to existing chat:', updatedUser);
+      console.log('New message added to existing chat:', updatedUser);
       return updatedUser;
     } else {
       // If chat history with the title doesn't exist, create a new one
       const updatedUser = await collection.findOneAndUpdate(
         { email: email },
-        { $push: { chatHistories: { title: chatTitle, messages: newMessages } } },
+        { $push: { chatHistories: { title: chatTitle, messages: [newMessage] } } },
         { returnDocument: 'after' }
       );
 
-      console.log('New chat history created with messages:', updatedUser);
+      console.log('New chat history created with message:', updatedUser);
       return updatedUser;
     }
   } catch (error) {
@@ -232,6 +232,7 @@ export async function addChatMessageByEmail(email, chatTitle, newMessages) {
     closeDatabase();
   }
 }
+
 
 export default async function handler(req, res) {
 
