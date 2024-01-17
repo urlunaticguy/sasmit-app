@@ -57,7 +57,7 @@ export async function addUser(email, password, name) {
       pointsToGo: 300,
       level: 1,
       weaknessQuestions: [],
-      chatHistories: {},
+      chatHistories: [],
     };
 
     const result = await collection.insertOne(newUser);
@@ -196,6 +196,7 @@ export async function addChatMessageByEmail(email, chatTitle, newMessage) {
   const db = await connectToDatabase();
   const collection = db.collection('users');
 
+
   try {
     const existingUser = await collection.findOne({ email: email });
 
@@ -203,9 +204,13 @@ export async function addChatMessageByEmail(email, chatTitle, newMessage) {
       throw new Error('User not found with the given email.');
     }
 
-    const existingChat = existingUser.chatHistories.find(chat => chat.title === chatTitle);
+    console.log("SD")
 
+    const existingChat = existingUser.chatHistories.find(chat => chat.title === chatTitle);
+    console.log("MD")
     if (existingChat) {
+      console.log("HELLoooo")
+
       // If chat history with the same title exists, append new message
       const updatedUser = await collection.findOneAndUpdate(
         { email: email, 'chatHistories.title': chatTitle },
@@ -216,6 +221,8 @@ export async function addChatMessageByEmail(email, chatTitle, newMessage) {
       console.log('New message added to existing chat:', updatedUser);
       return updatedUser;
     } else {
+
+      console.log("SDJNDSJND")
       // If chat history with the title doesn't exist, create a new one
       const updatedUser = await collection.findOneAndUpdate(
         { email: email },
@@ -295,6 +302,7 @@ export default async function handler(req, res) {
       const response = await addWeaknessQuestionByEmail(email, weaknessQuestion);
       res.status(200).json(response);
     } else if (val === "updateChatHistory") {
+      console.log("HELLO")
       const response = await addChatMessageByEmail(email, chatTitle, newMessage);
       res.status(200).json(response);
     } else {
